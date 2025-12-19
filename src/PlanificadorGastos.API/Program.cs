@@ -276,13 +276,10 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        
+
         // Aplicar migraciones pendientes
-        // await context.Database.MigrateAsync();
-        
-        // Seed de datos iniciales
-        // await DbInitializer.SeedAsync(context);
-        
+        await context.Database.MigrateAsync();
+
         Log.Information("Base de datos inicializada correctamente");
     }
     catch (Exception ex)
