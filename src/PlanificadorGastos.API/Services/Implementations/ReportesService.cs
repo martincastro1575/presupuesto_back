@@ -88,12 +88,15 @@ public class ReportesService : IReportesService
             ? Math.Round(diferencia / totalMesAnterior * 100, 2)
             : 0;
 
+        var cantidadGastos = (int)resumen.CantidadGastos;
+
         return new ResumenMensualResponse
         {
             Anio = fecha.Year,
             Mes = fecha.Month,
             TotalGastado = totalGastado,
-            CantidadGastos = (int)resumen.CantidadGastos,
+            CantidadGastos = cantidadGastos,
+            PromedioGasto = cantidadGastos > 0 ? Math.Round(totalGastado / cantidadGastos, 2) : 0,
             PromedioGastoDiario = diasTranscurridos > 0 ? Math.Round(totalGastado / diasTranscurridos, 2) : 0,
             TotalMesAnterior = totalMesAnterior,
             DiferenciaMesAnterior = diferencia,

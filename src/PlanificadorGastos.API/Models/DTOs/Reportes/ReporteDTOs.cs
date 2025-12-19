@@ -6,6 +6,7 @@ public record ResumenMensualResponse
     public int Mes { get; init; }
     public decimal TotalGastado { get; init; }
     public int CantidadGastos { get; init; }
+    public decimal PromedioGasto { get; init; }
     public decimal PromedioGastoDiario { get; init; }
     public decimal TotalMesAnterior { get; init; }
     public decimal DiferenciaMesAnterior { get; init; }
