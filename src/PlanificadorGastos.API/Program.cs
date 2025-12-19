@@ -268,52 +268,21 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ============================================
-// DATABASE INITIALIZATION
+// DATABASE INITIALIZATION (Solo desarrollo local)
 // ============================================
-using (var scope = app.Services.CreateScope())
+if (!usePostgreSql)
 {
+    using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-
-        Log.Information("Iniciando inicialización de base de datos. UsePostgreSql: {UsePostgreSql}", usePostgreSql);
-        Log.Information("Connection string configurada: {HasConnection}", !string.IsNullOrEmpty(connectionString));
-
-        // Verificar conexión primero
-        var canConnect = await context.Database.CanConnectAsync();
-        Log.Information("Puede conectar a la base de datos: {CanConnect}", canConnect);
-
-        if (!canConnect)
-        {
-            Log.Error("No se puede conectar a la base de datos");
-        }
-        else
-        {
-            // En producción con PostgreSQL, crear la BD si no existe
-            if (usePostgreSql)
-            {
-                var created = await context.Database.EnsureCreatedAsync();
-                Log.Information("EnsureCreatedAsync completado. Base de datos creada: {Created}", created);
-            }
-            else
-            {
-                // En desarrollo con SQL Server, usar migraciones
-                await context.Database.MigrateAsync();
-                Log.Information("Migraciones aplicadas correctamente");
-            }
-
-            // Verificar que las tablas existen
-            var tablesExist = await context.Categorias.AnyAsync() || await context.Database.CanConnectAsync();
-            Log.Information("Verificación de tablas completada");
-        }
-
-        Log.Information("Base de datos inicializada correctamente");
+        await context.Database.MigrateAsync();
+        Log.Information("Migraciones de SQL Server aplicadas correctamente");
     }
     catch (Exception ex)
     {
-        Log.Error(ex, "Error al inicializar la base de datos: {Message}", ex.Message);
-        throw; // Re-lanzar para que sea visible en los logs
+        Log.Error(ex, "Error al aplicar migraciones: {Message}", ex.Message);
     }
 }
 
