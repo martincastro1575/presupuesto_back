@@ -277,8 +277,16 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
 
-        // Aplicar migraciones pendientes
-        await context.Database.MigrateAsync();
+        // En producción con PostgreSQL, crear la BD si no existe
+        if (usePostgreSql)
+        {
+            await context.Database.EnsureCreatedAsync();
+        }
+        else
+        {
+            // En desarrollo con SQL Server, usar migraciones
+            await context.Database.MigrateAsync();
+        }
 
         Log.Information("Base de datos inicializada correctamente");
     }
