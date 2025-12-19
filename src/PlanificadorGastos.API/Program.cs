@@ -29,18 +29,35 @@ builder.Host.UseSerilog();
 // ============================================
 // DATABASE CONFIGURATION
 // ============================================
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var usePostgreSql = builder.Configuration.GetValue<bool>("UsePostgreSql");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        sqlOptions =>
+{
+    if (usePostgreSql)
+    {
+        options.UseNpgsql(connectionString, npgsqlOptions =>
+        {
+            npgsqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 3,
+                maxRetryDelay: TimeSpan.FromSeconds(10),
+                errorCodesToAdd: null);
+        });
+    }
+    else
+    {
+        options.UseSqlServer(connectionString, sqlOptions =>
         {
             sqlOptions.EnableRetryOnFailure(
                 maxRetryCount: 3,
                 maxRetryDelay: TimeSpan.FromSeconds(10),
                 errorNumbersToAdd: null);
-        })
-    .ConfigureWarnings(warnings =>
-        warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
+        });
+    }
+
+    options.ConfigureWarnings(warnings =>
+        warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+});
 
 // Dapper - Registrar connection string para inyección
 builder.Services.AddScoped<DapperContext>();
