@@ -95,3 +95,6 @@ database/
 
 # EF Core Migrations
 **/Migrations/
+
+# Documentación privada
+docs/
