@@ -178,17 +178,15 @@ public class ReportesService : IReportesService
                     MONTH(DATEADD(MONTH, -ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) + 1, GETDATE())) as Mes
                 FROM sys.objects
             )
-            SELECT 
+            SELECT
                 m.Anio,
                 m.Mes,
                 '' as MesNombre,
-                ISNULL(SUM(g.Monto), 0) as TotalGastado,
-                COUNT(g.Id) as CantidadGastos
+                ISNULL((SELECT SUM(Monto) FROM Gastos WHERE UserId = @UserId AND YEAR(Fecha) = m.Anio AND MONTH(Fecha) = m.Mes), 0) as TotalGastado,
+                ISNULL((SELECT SUM(Monto) FROM Ingresos WHERE UserId = @UserId AND YEAR(Fecha) = m.Anio AND MONTH(Fecha) = m.Mes), 0) as TotalIngresos,
+                ISNULL((SELECT COUNT(*) FROM Gastos WHERE UserId = @UserId AND YEAR(Fecha) = m.Anio AND MONTH(Fecha) = m.Mes), 0) as CantidadGastos,
+                ISNULL((SELECT COUNT(*) FROM Ingresos WHERE UserId = @UserId AND YEAR(Fecha) = m.Anio AND MONTH(Fecha) = m.Mes), 0) as CantidadIngresos
             FROM Meses m
-            LEFT JOIN Gastos g ON g.UserId = @UserId 
-                AND YEAR(g.Fecha) = m.Anio 
-                AND MONTH(g.Fecha) = m.Mes
-            GROUP BY m.Anio, m.Mes
             ORDER BY m.Anio, m.Mes;
         ";
 
@@ -196,10 +194,59 @@ public class ReportesService : IReportesService
 
         // Agregar nombre del mes
         var cultura = new CultureInfo("es-AR");
-        return result.Select(e => e with 
-        { 
-            MesNombre = cultura.DateTimeFormat.GetMonthName(e.Mes) 
+        return result.Select(e => e with
+        {
+            MesNombre = cultura.DateTimeFormat.GetMonthName(e.Mes)
         });
+    }
+
+    public async Task<IEnumerable<IngresoPorCategoriaResponse>> GetIngresosPorCategoriaAsync(int? anio = null, int? mes = null)
+    {
+        var fecha = new DateOnly(anio ?? DateTime.Today.Year, mes ?? DateTime.Today.Month, 1);
+
+        using var connection = _dapperContext.CreateConnection();
+
+        const string sql = @"
+            WITH TotalMes AS (
+                SELECT ISNULL(SUM(Monto), 0) as Total
+                FROM Ingresos
+                WHERE UserId = @UserId
+                  AND YEAR(Fecha) = @Anio
+                  AND MONTH(Fecha) = @Mes
+            )
+            SELECT
+                c.Id as CategoriaId,
+                c.Nombre as CategoriaNombre,
+                c.Icono as CategoriaIcono,
+                c.Color as CategoriaColor,
+                ISNULL(SUM(i.Monto), 0) as TotalMonto,
+                COUNT(i.Id) as CantidadIngresos,
+                CASE WHEN t.Total > 0
+                     THEN ROUND(ISNULL(SUM(i.Monto), 0) / t.Total * 100, 2)
+                     ELSE 0
+                END as Porcentaje
+            FROM Categorias c
+            CROSS JOIN TotalMes t
+            LEFT JOIN Ingresos i ON i.CategoriaId = c.Id
+                AND i.UserId = @UserId
+                AND YEAR(i.Fecha) = @Anio
+                AND MONTH(i.Fecha) = @Mes
+            WHERE (c.EsPredefinida = 1 OR c.UserId = @UserId)
+              AND c.Activa = 1
+              AND (c.Tipo = 2 OR c.Tipo = 3) -- Solo categorías de Ingreso o Ambos
+            GROUP BY c.Id, c.Nombre, c.Icono, c.Color, t.Total
+            HAVING ISNULL(SUM(i.Monto), 0) > 0
+            ORDER BY TotalMonto DESC;
+        ";
+
+        var result = await connection.QueryAsync<IngresoPorCategoriaResponse>(sql, new
+        {
+            UserId,
+            Anio = fecha.Year,
+            Mes = fecha.Month
+        });
+
+        return result;
     }
 
     public async Task<ComparativoMensualResponse> GetComparativoMensualAsync()

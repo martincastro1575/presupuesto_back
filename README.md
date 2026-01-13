@@ -141,11 +141,13 @@ La API usa JWT Bearer Tokens. Flujo:
 ### Categorías (`/api/categorias`)
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| GET | `/api/categorias` | Listar categorías |
+| GET | `/api/categorias` | Listar categorías (filtro: `?tipo=1` Gasto, `?tipo=2` Ingreso) |
 | GET | `/api/categorias/{id}` | Obtener categoría por ID |
 | POST | `/api/categorias` | Crear categoría |
 | PUT | `/api/categorias/{id}` | Actualizar categoría |
 | DELETE | `/api/categorias/{id}` | Eliminar categoría |
+
+> **Nota:** Las categorías tienen un campo `tipo` que indica si son de Gasto (1), Ingreso (2) o Ambos (3).
 
 ### Gastos (`/api/gastos`)
 | Método | Endpoint | Descripción |
@@ -164,15 +166,6 @@ La API usa JWT Bearer Tokens. Flujo:
 | POST | `/api/presupuestos` | Crear/actualizar presupuesto |
 | DELETE | `/api/presupuestos/{id}` | Eliminar presupuesto |
 
-### Tipos de Ingreso (`/api/tiposingreso`)
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | `/api/tiposingreso` | Listar tipos de ingreso |
-| GET | `/api/tiposingreso/{id}` | Obtener tipo por ID |
-| POST | `/api/tiposingreso` | Crear tipo de ingreso |
-| PUT | `/api/tiposingreso/{id}` | Actualizar tipo |
-| DELETE | `/api/tiposingreso/{id}` | Eliminar tipo |
-
 ### Ingresos (`/api/ingresos`)
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
@@ -186,9 +179,10 @@ La API usa JWT Bearer Tokens. Flujo:
 ### Reportes (`/api/reportes`)
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| GET | `/api/reportes/resumen-mensual` | Resumen del mes |
-| GET | `/api/reportes/por-categoria` | Gastos por categoría |
-| GET | `/api/reportes/evolucion` | Evolución mensual |
+| GET | `/api/reportes/resumen-mensual` | Resumen del mes (ingresos, gastos, balance) |
+| GET | `/api/reportes/por-categoria` | Gastos agrupados por categoría |
+| GET | `/api/reportes/ingresos-por-categoria` | Ingresos agrupados por categoría |
+| GET | `/api/reportes/evolucion` | Evolución mensual de ingresos y gastos |
 | GET | `/api/reportes/comparativo` | Comparativo mes actual vs anterior |
 
 ## ⚙️ Configuración JWT

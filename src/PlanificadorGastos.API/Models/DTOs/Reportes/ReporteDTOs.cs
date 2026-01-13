@@ -34,7 +34,21 @@ public record EvolucionMensualResponse
     public int Mes { get; init; }
     public string MesNombre { get; init; } = string.Empty;
     public decimal TotalGastado { get; init; }
+    public decimal TotalIngresos { get; init; }
+    public decimal Balance => TotalIngresos - TotalGastado;
     public int CantidadGastos { get; init; }
+    public int CantidadIngresos { get; init; }
+}
+
+public record IngresoPorCategoriaResponse
+{
+    public int CategoriaId { get; init; }
+    public string CategoriaNombre { get; init; } = string.Empty;
+    public string CategoriaIcono { get; init; } = string.Empty;
+    public string CategoriaColor { get; init; } = string.Empty;
+    public decimal TotalMonto { get; init; }
+    public int CantidadIngresos { get; init; }
+    public decimal Porcentaje { get; init; }
 }
 
 public record ComparativoMensualResponse
