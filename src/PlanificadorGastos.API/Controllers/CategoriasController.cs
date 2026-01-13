@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PlanificadorGastos.API.Models.Common;
 using PlanificadorGastos.API.Models.DTOs.Categorias;
+using PlanificadorGastos.API.Models.Entities;
 using PlanificadorGastos.API.Services.Interfaces;
 
 namespace PlanificadorGastos.API.Controllers;
@@ -21,11 +22,12 @@ public class CategoriasController : ControllerBase
     /// <summary>
     /// Obtener todas las categorías (predefinidas + del usuario)
     /// </summary>
+    /// <param name="tipo">Filtrar por tipo: Gasto (1), Ingreso (2), o Ambos (3)</param>
     [HttpGet]
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<CategoriaResponse>>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ApiResponse<IEnumerable<CategoriaResponse>>>> GetAll()
+    public async Task<ActionResult<ApiResponse<IEnumerable<CategoriaResponse>>>> GetAll([FromQuery] TipoCategoria? tipo = null)
     {
-        var categorias = await _categoriasService.GetAllAsync();
+        var categorias = await _categoriasService.GetAllAsync(tipo);
         return Ok(ApiResponse<IEnumerable<CategoriaResponse>>.Ok(categorias));
     }
 

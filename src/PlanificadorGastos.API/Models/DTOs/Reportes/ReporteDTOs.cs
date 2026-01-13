@@ -4,7 +4,10 @@ public record ResumenMensualResponse
 {
     public int Anio { get; init; }
     public int Mes { get; init; }
+    public decimal TotalIngresos { get; init; }
     public decimal TotalGastado { get; init; }
+    public decimal Balance => TotalIngresos - TotalGastado;
+    public int CantidadIngresos { get; init; }
     public int CantidadGastos { get; init; }
     public decimal PromedioGasto { get; init; }
     public decimal PromedioGastoDiario { get; init; }

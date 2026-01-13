@@ -28,22 +28,31 @@ public class ReportesService : IReportesService
         using var connection = _dapperContext.CreateConnection();
 
         const string sql = @"
-            -- Resumen mes actual
-            SELECT 
+            -- Resumen mes actual (gastos)
+            SELECT
                 @Anio as Anio,
                 @Mes as Mes,
                 ISNULL(SUM(g.Monto), 0) as TotalGastado,
                 COUNT(g.Id) as CantidadGastos
             FROM Gastos g
-            WHERE g.UserId = @UserId 
-              AND YEAR(g.Fecha) = @Anio 
+            WHERE g.UserId = @UserId
+              AND YEAR(g.Fecha) = @Anio
               AND MONTH(g.Fecha) = @Mes;
+
+            -- Resumen mes actual (ingresos)
+            SELECT
+                ISNULL(SUM(i.Monto), 0) as TotalIngresos,
+                COUNT(i.Id) as CantidadIngresos
+            FROM Ingresos i
+            WHERE i.UserId = @UserId
+              AND YEAR(i.Fecha) = @Anio
+              AND MONTH(i.Fecha) = @Mes;
 
             -- Total mes anterior
             SELECT ISNULL(SUM(Monto), 0) as TotalMesAnterior
             FROM Gastos
-            WHERE UserId = @UserId 
-              AND YEAR(Fecha) = @AnioAnterior 
+            WHERE UserId = @UserId
+              AND YEAR(Fecha) = @AnioAnterior
               AND MONTH(Fecha) = @MesAnterior;
 
             -- Categoría con mayor gasto
@@ -57,8 +66,8 @@ public class ReportesService : IReportesService
                 0 as Porcentaje
             FROM Gastos g
             INNER JOIN Categorias c ON g.CategoriaId = c.Id
-            WHERE g.UserId = @UserId 
-              AND YEAR(g.Fecha) = @Anio 
+            WHERE g.UserId = @UserId
+              AND YEAR(g.Fecha) = @Anio
               AND MONTH(g.Fecha) = @Mes
             GROUP BY c.Id, c.Nombre, c.Icono, c.Color
             ORDER BY SUM(g.Monto) DESC;
@@ -73,28 +82,33 @@ public class ReportesService : IReportesService
             MesAnterior = fechaAnterior.Month
         });
 
-        var resumen = await multi.ReadFirstAsync<dynamic>();
+        var resumenGastos = await multi.ReadFirstAsync<dynamic>();
+        var resumenIngresos = await multi.ReadFirstAsync<dynamic>();
         var totalMesAnterior = await multi.ReadFirstAsync<decimal>();
         var categoriaMayor = await multi.ReadFirstOrDefaultAsync<GastoPorCategoriaResponse>();
 
-        var totalGastado = (decimal)resumen.TotalGastado;
+        var totalGastado = (decimal)resumenGastos.TotalGastado;
+        var totalIngresos = (decimal)resumenIngresos.TotalIngresos;
+        var cantidadIngresos = (int)resumenIngresos.CantidadIngresos;
+        var cantidadGastos = (int)resumenGastos.CantidadGastos;
+
         var diasEnMes = DateTime.DaysInMonth(fecha.Year, fecha.Month);
         var diasTranscurridos = fecha.Month == DateTime.Today.Month && fecha.Year == DateTime.Today.Year
             ? DateTime.Today.Day
             : diasEnMes;
 
         var diferencia = totalGastado - totalMesAnterior;
-        var porcentajeCambio = totalMesAnterior > 0 
+        var porcentajeCambio = totalMesAnterior > 0
             ? Math.Round(diferencia / totalMesAnterior * 100, 2)
             : 0;
-
-        var cantidadGastos = (int)resumen.CantidadGastos;
 
         return new ResumenMensualResponse
         {
             Anio = fecha.Year,
             Mes = fecha.Month,
+            TotalIngresos = totalIngresos,
             TotalGastado = totalGastado,
+            CantidadIngresos = cantidadIngresos,
             CantidadGastos = cantidadGastos,
             PromedioGasto = cantidadGastos > 0 ? Math.Round(totalGastado / cantidadGastos, 2) : 0,
             PromedioGastoDiario = diasTranscurridos > 0 ? Math.Round(totalGastado / diasTranscurridos, 2) : 0,

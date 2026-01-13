@@ -20,12 +20,20 @@ public class CategoriasService : ICategoriasService
     private int UserId => _currentUserService.UserId 
         ?? throw new UnauthorizedAccessException("Usuario no autenticado");
 
-    public async Task<IEnumerable<CategoriaResponse>> GetAllAsync()
+    public async Task<IEnumerable<CategoriaResponse>> GetAllAsync(TipoCategoria? tipo = null)
     {
-        // Obtener categorías predefinidas + categorías del usuario
-        var categorias = await _context.Categorias
+        // Obtener categorias predefinidas + categorias del usuario
+        var query = _context.Categorias
             .Where(c => c.EsPredefinida || c.UserId == UserId)
-            .Where(c => c.Activa)
+            .Where(c => c.Activa);
+
+        // Filtrar por tipo si se especifica
+        if (tipo.HasValue)
+        {
+            query = query.Where(c => c.Tipo == tipo.Value || c.Tipo == TipoCategoria.Ambos);
+        }
+
+        var categorias = await query
             .OrderBy(c => c.EsPredefinida ? 0 : 1)
             .ThenBy(c => c.Nombre)
             .Select(c => new CategoriaResponse
@@ -34,6 +42,7 @@ public class CategoriasService : ICategoriasService
                 Nombre = c.Nombre,
                 Icono = c.Icono,
                 Color = c.Color,
+                Tipo = c.Tipo,
                 EsPredefinida = c.EsPredefinida,
                 Activa = c.Activa
             })
@@ -52,6 +61,7 @@ public class CategoriasService : ICategoriasService
                 Nombre = c.Nombre,
                 Icono = c.Icono,
                 Color = c.Color,
+                Tipo = c.Tipo,
                 EsPredefinida = c.EsPredefinida,
                 Activa = c.Activa
             })
@@ -77,6 +87,7 @@ public class CategoriasService : ICategoriasService
             Nombre = request.Nombre,
             Icono = request.Icono,
             Color = request.Color,
+            Tipo = request.Tipo,
             EsPredefinida = false,
             Activa = true,
             CreatedAt = DateTime.UtcNow
@@ -91,6 +102,7 @@ public class CategoriasService : ICategoriasService
             Nombre = categoria.Nombre,
             Icono = categoria.Icono,
             Color = categoria.Color,
+            Tipo = categoria.Tipo,
             EsPredefinida = categoria.EsPredefinida,
             Activa = categoria.Activa
         };
@@ -128,6 +140,7 @@ public class CategoriasService : ICategoriasService
             Nombre = categoria.Nombre,
             Icono = categoria.Icono,
             Color = categoria.Color,
+            Tipo = categoria.Tipo,
             EsPredefinida = categoria.EsPredefinida,
             Activa = categoria.Activa
         };
@@ -143,10 +156,11 @@ public class CategoriasService : ICategoriasService
             return false;
         }
 
-        // Verificar si tiene gastos asociados
+        // Verificar si tiene gastos o ingresos asociados
         var tieneGastos = await _context.Gastos.AnyAsync(g => g.CategoriaId == id);
+        var tieneIngresos = await _context.Ingresos.AnyAsync(i => i.CategoriaId == id);
 
-        if (tieneGastos)
+        if (tieneGastos || tieneIngresos)
         {
             // En lugar de eliminar, desactivar
             categoria.Activa = false;

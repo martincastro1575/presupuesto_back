@@ -164,6 +164,25 @@ La API usa JWT Bearer Tokens. Flujo:
 | POST | `/api/presupuestos` | Crear/actualizar presupuesto |
 | DELETE | `/api/presupuestos/{id}` | Eliminar presupuesto |
 
+### Tipos de Ingreso (`/api/tiposingreso`)
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/api/tiposingreso` | Listar tipos de ingreso |
+| GET | `/api/tiposingreso/{id}` | Obtener tipo por ID |
+| POST | `/api/tiposingreso` | Crear tipo de ingreso |
+| PUT | `/api/tiposingreso/{id}` | Actualizar tipo |
+| DELETE | `/api/tiposingreso/{id}` | Eliminar tipo |
+
+### Ingresos (`/api/ingresos`)
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/api/ingresos` | Listar ingresos |
+| GET | `/api/ingresos/{id}` | Obtener ingreso por ID |
+| GET | `/api/ingresos/periodo/{anio}/{mes}` | Obtener por período |
+| POST | `/api/ingresos` | Crear ingreso |
+| PUT | `/api/ingresos/{id}` | Actualizar ingreso |
+| DELETE | `/api/ingresos/{id}` | Eliminar ingreso |
+
 ### Reportes (`/api/reportes`)
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|

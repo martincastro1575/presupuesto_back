@@ -17,6 +17,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IGastosService, GastosService>();
         services.AddScoped<IPresupuestosService, PresupuestosService>();
         services.AddScoped<IReportesService, ReportesService>();
+        services.AddScoped<IIngresosService, IngresosService>();
 
         // HttpContext accessor para obtener el usuario actual
         services.AddHttpContextAccessor();
