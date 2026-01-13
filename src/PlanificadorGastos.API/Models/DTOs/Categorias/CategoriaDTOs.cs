@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PlanificadorGastos.API.Models.Entities;
 
 namespace PlanificadorGastos.API.Models.DTOs.Categorias;
 
@@ -8,6 +9,7 @@ public record CategoriaResponse
     public string Nombre { get; init; } = string.Empty;
     public string Icono { get; init; } = string.Empty;
     public string Color { get; init; } = string.Empty;
+    public TipoCategoria Tipo { get; init; }
     public bool EsPredefinida { get; init; }
     public bool Activa { get; init; }
 }
@@ -21,8 +23,11 @@ public record CreateCategoriaRequest
     [StringLength(50)]
     public string Icono { get; init; } = "pi-tag";
 
-    [RegularExpression("^#[0-9A-Fa-f]{6}$", ErrorMessage = "El color debe ser un código hexadecimal válido (ej: #FF5733)")]
+    [RegularExpression("^#[0-9A-Fa-f]{6}$", ErrorMessage = "El color debe ser un codigo hexadecimal valido (ej: #FF5733)")]
     public string Color { get; init; } = "#6366f1";
+
+    [Required(ErrorMessage = "El tipo es requerido")]
+    public TipoCategoria Tipo { get; init; } = TipoCategoria.Gasto;
 }
 
 public record UpdateCategoriaRequest
@@ -34,8 +39,10 @@ public record UpdateCategoriaRequest
     [StringLength(50)]
     public string Icono { get; init; } = string.Empty;
 
-    [RegularExpression("^#[0-9A-Fa-f]{6}$", ErrorMessage = "El color debe ser un código hexadecimal válido (ej: #FF5733)")]
+    [RegularExpression("^#[0-9A-Fa-f]{6}$", ErrorMessage = "El color debe ser un codigo hexadecimal valido (ej: #FF5733)")]
     public string Color { get; init; } = string.Empty;
+
+    public TipoCategoria Tipo { get; init; }
 
     public bool Activa { get; init; } = true;
 }

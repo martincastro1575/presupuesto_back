@@ -37,11 +37,24 @@ public class ReportesController : ControllerBase
     [HttpGet("por-categoria")]
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<GastoPorCategoriaResponse>>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<IEnumerable<GastoPorCategoriaResponse>>>> GetPorCategoria(
-        [FromQuery] int? anio = null, 
+        [FromQuery] int? anio = null,
         [FromQuery] int? mes = null)
     {
         var gastos = await _reportesService.GetGastosPorCategoriaAsync(anio, mes);
         return Ok(ApiResponse<IEnumerable<GastoPorCategoriaResponse>>.Ok(gastos));
+    }
+
+    /// <summary>
+    /// Obtener ingresos agrupados por categoría
+    /// </summary>
+    [HttpGet("ingresos-por-categoria")]
+    [ProducesResponseType(typeof(ApiResponse<IEnumerable<IngresoPorCategoriaResponse>>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ApiResponse<IEnumerable<IngresoPorCategoriaResponse>>>> GetIngresosPorCategoria(
+        [FromQuery] int? anio = null,
+        [FromQuery] int? mes = null)
+    {
+        var ingresos = await _reportesService.GetIngresosPorCategoriaAsync(anio, mes);
+        return Ok(ApiResponse<IEnumerable<IngresoPorCategoriaResponse>>.Ok(ingresos));
     }
 
     /// <summary>
