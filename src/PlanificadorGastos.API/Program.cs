@@ -14,6 +14,10 @@ using StackExchange.Profiling;
 using System.IO.Compression;
 using System.Text;
 
+// Habilitar comportamiento legacy de timestamps para compatibilidad PostgreSQL/SQL Server
+// Esto permite usar DateTime con Kind=Unspecified en PostgreSQL
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // ============================================
