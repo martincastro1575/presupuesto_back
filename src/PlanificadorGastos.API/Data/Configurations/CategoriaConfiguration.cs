@@ -39,8 +39,7 @@ public class CategoriaConfiguration : IEntityTypeConfiguration<Categoria>
             .HasDefaultValue(true);
 
         builder.Property(c => c.CreatedAt)
-            .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()");
+            .IsRequired();
 
         // Relacion con Usuario (opcional para categorias predefinidas)
         builder.HasOne(c => c.Usuario)
