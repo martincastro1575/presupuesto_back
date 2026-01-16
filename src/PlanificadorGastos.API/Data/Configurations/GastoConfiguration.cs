@@ -23,8 +23,7 @@ public class GastoConfiguration : IEntityTypeConfiguration<Gasto>
             .HasMaxLength(500);
 
         builder.Property(g => g.CreatedAt)
-            .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()");
+            .IsRequired();
 
         // Relación con Usuario
         builder.HasOne(g => g.Usuario)

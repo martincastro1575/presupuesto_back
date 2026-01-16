@@ -23,8 +23,7 @@ public class PresupuestoConfiguration : IEntityTypeConfiguration<Presupuesto>
             .IsRequired();
 
         builder.Property(p => p.CreatedAt)
-            .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()");
+            .IsRequired();
 
         // Relación con Usuario
         builder.HasOne(p => p.Usuario)

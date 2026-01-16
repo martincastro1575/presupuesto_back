@@ -13,8 +13,7 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
             .HasMaxLength(100);
 
         builder.Property(u => u.CreatedAt)
-            .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()");
+            .IsRequired();
 
         builder.HasIndex(u => u.Email)
             .IsUnique();

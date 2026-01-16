@@ -27,7 +27,7 @@ public class IngresoConfiguration : IEntityTypeConfiguration<Ingreso>
             .HasMaxLength(500);
 
         builder.Property(i => i.CreatedAt)
-            .HasDefaultValueSql("GETUTCDATE()");
+            .IsRequired();
 
         // Relacion con Usuario
         builder.HasOne(i => i.Usuario)
