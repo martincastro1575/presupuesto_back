@@ -98,3 +98,6 @@ database/
 
 # Documentación privada
 docs/
+
+# Claude Code temp files
+tmpclaude-*
