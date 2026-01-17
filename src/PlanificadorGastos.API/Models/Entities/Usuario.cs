@@ -15,4 +15,5 @@ public class Usuario : IdentityUser<int>
     public virtual ICollection<Gasto> Gastos { get; set; } = [];
     public virtual ICollection<Presupuesto> Presupuestos { get; set; } = [];
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = [];
+    public virtual ICollection<LimiteCategoria> LimitesCategorias { get; set; } = [];
 }

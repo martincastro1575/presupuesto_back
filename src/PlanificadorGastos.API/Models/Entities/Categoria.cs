@@ -25,4 +25,5 @@ public class Categoria
     public virtual ICollection<Gasto> Gastos { get; set; } = [];
     public virtual ICollection<Ingreso> Ingresos { get; set; } = [];
     public virtual ICollection<Presupuesto> Presupuestos { get; set; } = [];
+    public virtual ICollection<LimiteCategoria> LimitesCategorias { get; set; } = [];
 }

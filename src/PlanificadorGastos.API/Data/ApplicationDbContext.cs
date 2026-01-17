@@ -17,6 +17,7 @@ public class ApplicationDbContext : IdentityDbContext<Usuario, IdentityRole<int>
     public DbSet<Presupuesto> Presupuestos => Set<Presupuesto>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<Ingreso> Ingresos => Set<Ingreso>();
+    public DbSet<LimiteCategoria> LimitesCategorias => Set<LimiteCategoria>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -29,6 +30,7 @@ public class ApplicationDbContext : IdentityDbContext<Usuario, IdentityRole<int>
         modelBuilder.ApplyConfiguration(new PresupuestoConfiguration());
         modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
         modelBuilder.ApplyConfiguration(new IngresoConfiguration());
+        modelBuilder.ApplyConfiguration(new LimiteCategoriaConfiguration());
 
         // Renombrar tablas de Identity (opcional, para mantener consistencia)
         modelBuilder.Entity<Usuario>().ToTable("Usuarios");
