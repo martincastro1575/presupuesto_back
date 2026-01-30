@@ -18,6 +18,8 @@ public record PresupuestoResponse
 
 public record CreatePresupuestoRequest
 {
+    public int? Id { get; init; }  // Si viene, actualiza por Id en lugar de crear/buscar por combinación
+
     public int? CategoriaId { get; init; }  // Null para presupuesto general
 
     [Required(ErrorMessage = "El monto límite es requerido")]

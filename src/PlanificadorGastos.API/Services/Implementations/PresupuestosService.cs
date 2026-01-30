@@ -49,26 +49,24 @@ public class PresupuestosService : IPresupuestosService
 
     public async Task<PresupuestoResponse> CreateOrUpdateAsync(CreatePresupuestoRequest request)
     {
-        // Verificar si ya existe un presupuesto para este período/categoría
-        var existente = await _context.Presupuestos
-            .FirstOrDefaultAsync(p => p.UserId == UserId && 
-                                      p.CategoriaId == request.CategoriaId &&
-                                      p.Anio == request.Anio && 
-                                      p.Mes == request.Mes);
+        Presupuesto? existente = null;
 
-        if (existente != null)
+        // Si viene Id, buscar por Id para actualizar todos los campos
+        if (request.Id.HasValue)
         {
-            // Actualizar existente
-            existente.MontoLimite = request.MontoLimite;
-            await _context.SaveChangesAsync();
-        }
-        else
-        {
+            existente = await _context.Presupuestos
+                .FirstOrDefaultAsync(p => p.Id == request.Id.Value && p.UserId == UserId);
+
+            if (existente == null)
+            {
+                throw new ArgumentException("El presupuesto no existe o no tienes permisos para modificarlo");
+            }
+
             // Validar categoría si se especificó
             if (request.CategoriaId.HasValue)
             {
                 var categoriaValida = await _context.Categorias
-                    .AnyAsync(c => c.Id == request.CategoriaId.Value && 
+                    .AnyAsync(c => c.Id == request.CategoriaId.Value &&
                                   (c.EsPredefinida || c.UserId == UserId));
 
                 if (!categoriaValida)
@@ -77,18 +75,56 @@ public class PresupuestosService : IPresupuestosService
                 }
             }
 
-            existente = new Presupuesto
-            {
-                UserId = UserId,
-                CategoriaId = request.CategoriaId,
-                MontoLimite = request.MontoLimite,
-                Anio = request.Anio,
-                Mes = request.Mes,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            _context.Presupuestos.Add(existente);
+            // Actualizar todos los campos
+            existente.CategoriaId = request.CategoriaId;
+            existente.MontoLimite = request.MontoLimite;
+            existente.Anio = request.Anio;
+            existente.Mes = request.Mes;
             await _context.SaveChangesAsync();
+        }
+        else
+        {
+            // Verificar si ya existe un presupuesto para este período/categoría
+            existente = await _context.Presupuestos
+                .FirstOrDefaultAsync(p => p.UserId == UserId &&
+                                          p.CategoriaId == request.CategoriaId &&
+                                          p.Anio == request.Anio &&
+                                          p.Mes == request.Mes);
+
+            if (existente != null)
+            {
+                // Actualizar existente (solo monto, ya que coincide categoría/período)
+                existente.MontoLimite = request.MontoLimite;
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // Validar categoría si se especificó
+                if (request.CategoriaId.HasValue)
+                {
+                    var categoriaValida = await _context.Categorias
+                        .AnyAsync(c => c.Id == request.CategoriaId.Value &&
+                                      (c.EsPredefinida || c.UserId == UserId));
+
+                    if (!categoriaValida)
+                    {
+                        throw new ArgumentException("La categoría seleccionada no es válida");
+                    }
+                }
+
+                existente = new Presupuesto
+                {
+                    UserId = UserId,
+                    CategoriaId = request.CategoriaId,
+                    MontoLimite = request.MontoLimite,
+                    Anio = request.Anio,
+                    Mes = request.Mes,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.Presupuestos.Add(existente);
+                await _context.SaveChangesAsync();
+            }
         }
 
         // Retornar con el gasto calculado
