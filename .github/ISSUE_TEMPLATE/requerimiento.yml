@@ -1,0 +1,34 @@
+name: "📋 Nuevo Requerimiento"
+description: "Documentar un nuevo requerimiento funcional"
+labels: ["requerimiento"]
+body:
+  - type: textarea
+    id: descripcion
+    attributes:
+      label: Descripción
+      description: Qué se necesita lograr
+    validations:
+      required: true
+  - type: textarea
+    id: criterios
+    attributes:
+      label: Criterios de Aceptación
+      description: Lista de criterios para dar por cumplido el requerimiento
+      value: |
+        - [ ] Criterio 1
+        - [ ] Criterio 2
+  - type: dropdown
+    id: prioridad
+    attributes:
+      label: Prioridad
+      options:
+        - Crítica
+        - Alta
+        - Media
+        - Baja
+    validations:
+      required: true
+  - type: textarea
+    id: notas
+    attributes:
+      label: Notas técnicas
