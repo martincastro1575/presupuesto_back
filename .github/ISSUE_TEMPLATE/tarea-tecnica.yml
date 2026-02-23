@@ -1,0 +1,43 @@
+name: "⚙️ Tarea Técnica"
+description: "Crear una tarea de desarrollo"
+labels: ["tarea-técnica"]
+body:
+  - type: textarea
+    id: descripcion
+    attributes:
+      label: Descripción
+      description: Qué hay que implementar
+    validations:
+      required: true
+  - type: input
+    id: req-relacionado
+    attributes:
+      label: Requerimiento relacionado
+      description: "Número del issue de requerimiento (ej: #5)"
+  - type: dropdown
+    id: componente
+    attributes:
+      label: Componente
+      options:
+        - Backend - API
+        - Backend - DB
+        - Frontend - UI
+        - Frontend - Lógica
+        - Infraestructura
+    validations:
+      required: true
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Pasos de implementación
+      value: |
+        - [ ] Paso 1
+        - [ ] Paso 2
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing requerido
+      value: |
+        - [ ] Test unitario
+        - [ ] Test de integración
+        - [ ] Validación funcional
